@@ -1,0 +1,51 @@
+#!/bin/bash
+
+WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+CURRENT_FILE="$HOME/.cache/current-wallpaper"
+
+current_wallpaper=""
+
+if [ -f "$CURRENT_FILE" ]; then
+    current_wallpaper=$(<"$CURRENT_FILE")
+fi
+
+selected=$(
+    find "$WALLPAPER_DIR" -maxdepth 1 -type f \
+        \( \
+            -iname '*.jpg' \
+            -o -iname '*.jpeg' \
+            -o -iname '*.png' \
+            -o -iname '*.webp' \
+        \) \
+        -print0 |
+    while IFS= read -r -d '' wallpaper; do
+        filename=$(basename "$wallpaper")
+
+        if [ "$wallpaper" = "$current_wallpaper" ]; then
+            display="✓  $filename"
+        else
+            display="$filename"
+        fi
+
+        printf '%s\0icon\x1f%s\n' \
+            "$display" \
+            "$wallpaper"
+    done |
+    rofi \
+        -dmenu \
+        -show-icons \
+        -theme "$HOME/.config/rofi/wallpaper-picker.rasi" \
+        -p "Wallpaper"
+)
+
+if [ -z "$selected" ]; then
+    exit 0
+fi
+
+selected="${selected#✓  }"
+
+wallpaper="$WALLPAPER_DIR/$selected"
+
+if [ -f "$wallpaper" ]; then
+    "$HOME/.local/bin/wall.sh" "$wallpaper"
+fi

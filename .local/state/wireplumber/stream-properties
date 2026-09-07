@@ -1,0 +1,7 @@
+[stream-properties]
+Audio/Sink:node.name:auto_null={"channelMap":["FL", "FR"], "volume":1.000000, "mute":false, "channelVolumes":[1.000000, 1.000000]}
+Input/Audio:application.id:org.PulseAudio.pavucontrol={"channelMap":["MONO"], "volume":1.000000, "mute":false, "channelVolumes":[1.000000]}
+Output/Audio:application.name:Firefox={"channelMap":["FL", "FR"], "volume":1.000000, "mute":false, "channelVolumes":[1.000000, 1.000000]}
+Output/Audio:media.role:Notification={"channelMap":["FL", "FR"], "volume":1.000000, "mute":false, "channelVolumes":[1.000000, 1.000000]}
+Input/Audio:application.name:Firefox={"channelMap":["MONO"], "mute":false, "volume":1.000000, "channelVolumes":[1.000000]}
+Output/Audio:media.name:Playback\sStream={"channelVolumes":[1.000000, 1.000000], "mute":false, "channelMap":["FL", "FR"], "volume":1.000000}
