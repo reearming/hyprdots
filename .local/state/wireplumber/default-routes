@@ -1,8 +1,0 @@
-[default-routes]
-bluez_card.7C_C9_5E_76_47_03:output:headset-output={"mute":false, "latencyOffsetNsec":0, "channelMap":["FL", "FR"], "channelVolumes":[0.006859, 0.006859]}
-bluez_card.7C_C9_5E_76_47_03:profile:a2dp-sink=["headset-output"]
-bluez_card.7C_C9_5E_76_47_03:output:bluetooth-output={"channelMap":["FL", "FR"], "mute":false, "channelVolumes":[0.015588, 0.015588], "latencyOffsetNsec":0}
-bluez_card.7C_C9_5E_76_47_03:output:headset-hf-output={"mute":false, "channelMap":["MONO"], "channelVolumes":[0.064000]}
-bluez_card.7C_C9_5E_76_47_03:profile:headset-head-unit=["headset-hf-output"]
-alsa_card.pci-0000_04_00.0:output:hdmi-output-0={"iec958Codecs":["PCM"], "mute":false, "channelVolumes":[0.029790, 0.029790], "latencyOffsetNsec":0, "channelMap":["FL", "FR"]}
-alsa_card.pci-0000_04_00.0:profile:output:hdmi-stereo=["hdmi-output-0"]
