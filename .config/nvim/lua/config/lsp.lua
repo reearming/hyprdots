@@ -9,8 +9,6 @@ vim.lsp.config("lua_ls", {
         ".git",
     },
 
-    capabilities = require("blink.cmp").get_lsp_capabilities(),
-
     settings = {
         Lua = {
             diagnostics = {
@@ -35,12 +33,25 @@ vim.lsp.config("clangd", {
         "compile_flags.txt",
         ".git",
     },
+})
 
-    capabilities = require("blink.cmp").get_lsp_capabilities(),
+vim.lsp.config("rust_analyzer", {
+    cmd = { "rust-analyzer" },
+
+    filetypes = {
+        "rust",
+    },
+
+    root_markers = {
+        "Cargo.toml",
+        "Cargo.lock",
+        ".git",
+    },
 })
 
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("clangd")
+vim.lsp.enable("rust_analyzer")
 
 vim.diagnostic.config({
     virtual_text = true,

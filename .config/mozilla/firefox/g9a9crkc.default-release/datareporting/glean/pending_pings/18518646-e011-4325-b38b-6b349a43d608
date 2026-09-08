@@ -1,0 +1,3 @@
+/submit/firefox-desktop/bounce-tracking-protection/1/18518646-e011-4325-b38b-6b349a43d608
+{"metrics":{"labeled_counter":{"glean.error.invalid_value":{"glean.restarted":1}},"string_list":{"glean.ping.uploader_capabilities":["ohttp"]}}}
+{"headers":{},"body_has_info_sections":false,"ping_name":"bounce-tracking-protection","uploader_capabilities":["ohttp"]}

@@ -7,4 +7,8 @@ hl.bind("SUPER + W", hl.dsp.exec_cmd("~/.local/bin/wallpaper-picker"))
 hl.bind("Print", hl.dsp.exec_cmd("hyprshot -m region"))
 hl.bind("SUPER + V", hl.dsp.exec_cmd("~/.local/bin/clipboard-picker"))
 hl.bind("Shift_L + Print", hl.dsp.exec_cmd("hyprshot -m output"))
+hl.env("HYPRSHOT_DIR", "/home/reearming/Pictures/Screenshots")
+
+hl.env("GTK_THEME", "adw-gtk-theme")
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 
