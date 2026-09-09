@@ -1,2 +1,0 @@
-{"timestamp":6905699,"category":"bounce.tracking.protection","name":"purge_action","extra":{"site_host":"dnsafrica.org","bounce_time":"1788876097","is_dry_run":"false","glean_timestamp":"1788882279413","success":"true"},"execution_counter":21}
-{"timestamp":6905699,"category":"bounce.tracking.protection","name":"purge_action","extra":{"is_dry_run":"false","bounce_time":"1788878255","site_host":"openai.com","success":"true","glean_timestamp":"1788882279413"},"execution_counter":21}
