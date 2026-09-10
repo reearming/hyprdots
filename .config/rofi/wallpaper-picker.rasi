@@ -52,7 +52,7 @@ element {
 element-icon {
     background-color: transparent;
     size: 340px;
-    padding: 5px;
+    padding: 1px;
 }
 
 element-text {
