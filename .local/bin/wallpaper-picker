@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+WALLPAPER_DIR="$HOME/Pictures/Wallpaper"
 CURRENT_FILE="$HOME/.cache/current-wallpaper"
 
 current_wallpaper=""
