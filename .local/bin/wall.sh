@@ -26,5 +26,5 @@ source_index=$((RANDOM % count))
 matugen image \
     --source-color-index "$source_index" \
     "$wallpaper" &&
-awww img "$wallpaper" -t random &&
+awww img "$wallpaper" -t random --transition-fps 165 &&
 printf '%s\n' "$wallpaper" > "$HOME/.cache/current-wallpaper"
