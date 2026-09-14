@@ -16,6 +16,7 @@ PanelWindow {
     exclusiveZone: 40
     color: "transparent"
 
+    property bool mediaPopupOpen: false
     property bool brightnessPopupOpen: false
     property bool volumePopupOpen: false
 
@@ -30,6 +31,19 @@ PanelWindow {
 
         Region {
             item: rightBlock
+        }
+
+        Region {
+            item: mediaEdge
+        }
+
+        Region {
+            x: mediaPopup.x
+            y: mediaPopup.y
+            width: mediaPopup.width
+            height: bar.mediaPopupOpen
+                ? mediaPopup.height
+                : 0
         }
 
         Region {
@@ -136,15 +150,6 @@ PanelWindow {
                     }
                 }
             }
-
-            Item {
-                width: 20
-                height: 1
-            }
-
-            Media {
-                id: media
-            }
         }
     }
 
@@ -154,10 +159,7 @@ PanelWindow {
         width: 500
         height: 40
 
-        x: parent.width / 2
-            - width / 2
-            + 60
-
+        x: parent.width / 2 - width / 2
         y: 0
 
         color: Colors.md3.surface
@@ -362,6 +364,117 @@ PanelWindow {
         }
     }
 
+    Item {
+        id: mediaEdge
+
+        x: 0
+        y: 0
+
+        width: 4
+        height: bar.height
+
+        z: 10
+
+        HoverHandler {
+            id: mediaEdgeHover
+
+            onHoveredChanged: {
+                if (hovered) {
+                    mediaCloseTimer.stop()
+                    bar.mediaPopupOpen = true
+                } else {
+                    mediaCloseTimer.restart()
+                }
+            }
+        }
+    }
+
+    Timer {
+        id: mediaCloseTimer
+
+        interval: 250
+        repeat: false
+
+        onTriggered: {
+            if (!mediaEdgeHover.hovered &&
+                !mediaPopupHover.hovered) {
+                bar.mediaPopupOpen = false
+            }
+        }
+    }
+
+    Rectangle {
+        id: mediaPopup
+
+        width: mediaContent.implicitWidth + 20
+        height: 40
+
+        x: 8
+        y: bar.mediaPopupOpen ? 34 : 18
+
+        radius: 10
+
+        color: Colors.md3.surface
+
+        opacity: bar.mediaPopupOpen ? 1 : 0
+        scale: bar.mediaPopupOpen ? 1 : 0.85
+
+        transformOrigin: Item.TopLeft
+
+        z: 3
+
+        Behavior on y {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 120
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        HoverHandler {
+            id: mediaPopupHover
+
+            enabled: bar.mediaPopupOpen
+
+            onHoveredChanged: {
+                if (hovered) {
+                    mediaCloseTimer.stop()
+                } else if (!mediaEdgeHover.hovered) {
+                    mediaCloseTimer.restart()
+                }
+            }
+        }
+
+        Row {
+            id: mediaContent
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+
+                leftMargin: 10
+                rightMargin: 10
+            }
+
+            Media {
+                id: media
+            }
+        }
+    }
+
     Timer {
         id: brightnessCloseTimer
 
@@ -412,7 +525,7 @@ PanelWindow {
 
         transformOrigin: Item.Top
 
-        z: 1
+        z: 3
 
         Behavior on y {
             NumberAnimation {
@@ -472,10 +585,8 @@ PanelWindow {
 
                 height: parent.height
 
-                anchors {
-                    left: parent.left
-                    verticalCenter: parent.verticalCenter
-                }
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
 
                 radius: 4
 
@@ -550,7 +661,7 @@ PanelWindow {
 
         transformOrigin: Item.Top
 
-        z: 1
+        z: 3
 
         Behavior on y {
             NumberAnimation {
@@ -610,10 +721,8 @@ PanelWindow {
 
                 height: parent.height
 
-                anchors {
-                    left: parent.left
-                    verticalCenter: parent.verticalCenter
-                }
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
 
                 radius: 4
 
