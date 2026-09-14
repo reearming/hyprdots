@@ -1,0 +1,123 @@
+:root {
+    --matugen-surface: {{colors.surface.default.hex}};
+    --matugen-surface-container: {{colors.surface_container.default.hex}};
+    --matugen-surface-container-high: {{colors.surface_container_high.default.hex}};
+    --matugen-surface-container-highest: {{colors.surface_container_highest.default.hex}};
+
+    --matugen-on-surface: {{colors.on_surface.default.hex}};
+    --matugen-on-surface-variant: {{colors.on_surface_variant.default.hex}};
+
+    --matugen-primary: {{colors.primary.default.hex}};
+    --matugen-on-primary: {{colors.on_primary.default.hex}};
+
+    --matugen-secondary: {{colors.secondary.default.hex}};
+    --matugen-on-secondary: {{colors.on_secondary.default.hex}};
+
+    --matugen-outline: {{colors.outline.default.hex}};
+}
+
+
+/* =========================================================
+   Firefox
+   ========================================================= */
+
+#navigator-toolbox,
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar {
+    background: var(--matugen-surface) !important;
+    color: var(--matugen-on-surface) !important;
+}
+
+
+/* =========================================================
+   Tabs
+   ========================================================= */
+
+.tabbrowser-tab {
+    color: var(--matugen-on-surface-variant) !important;
+}
+
+.tabbrowser-tab .tab-label {
+    color: var(--matugen-on-surface-variant) !important;
+}
+
+.tabbrowser-tab:not([selected]):hover .tab-label {
+    color: var(--matugen-on-surface) !important;
+}
+
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {
+    background: var(--matugen-primary) !important;
+}
+
+.tabbrowser-tab[selected] .tab-label {
+    color: var(--matugen-on-primary) !important;
+}
+
+/* =========================================================
+   URL bar
+   ========================================================= */
+
+#urlbar-background {
+    background: var(--matugen-surface-container) !important;
+    border: 1px solid var(--matugen-outline) !important;
+    box-shadow: none !important;
+}
+
+#urlbar[focused="true"] > #urlbar-background {
+    background: var(--matugen-surface-container-high) !important;
+    border-color: var(--matugen-primary) !important;
+}
+
+#urlbar-input {
+    color: var(--matugen-on-surface) !important;
+}
+
+
+/* =========================================================
+   Toolbar buttons
+   ========================================================= */
+
+.toolbarbutton-1 {
+    color: var(--matugen-on-surface-variant) !important;
+}
+
+.toolbarbutton-1:hover {
+    color: var(--matugen-on-surface) !important;
+    background: var(--matugen-surface-container-high) !important;
+}
+
+.toolbarbutton-1:active,
+.toolbarbutton-1[open="true"] {
+    background: var(--matugen-secondary) !important;
+    color: var(--matugen-on-secondary) !important;
+}
+
+
+/* =========================================================
+   Menus / panels
+   ========================================================= */
+
+menupopup,
+panel {
+    --panel-background: var(--matugen-surface-container) !important;
+    --panel-color: var(--matugen-on-surface) !important;
+
+    background: var(--matugen-surface-container) !important;
+    color: var(--matugen-on-surface) !important;
+}
+
+menuitem:hover,
+.subviewbutton:hover {
+    background: var(--matugen-surface-container-high) !important;
+    color: var(--matugen-on-surface) !important;
+}
+
+
+/* =========================================================
+   Separators
+   ========================================================= */
+
+#navigator-toolbox {
+    border-bottom: 1px solid var(--matugen-outline) !important;
+}

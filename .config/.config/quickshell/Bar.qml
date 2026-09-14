@@ -1,0 +1,554 @@
+//@ pragma UseQApplication
+
+import QtQuick
+import Quickshell
+import Quickshell.Hyprland
+import Quickshell.Widgets
+
+PanelWindow {
+    id: bar
+
+    anchors {
+        top: true
+        left: true
+        right: true
+    }
+
+    implicitHeight: 100
+    exclusiveZone: 40
+    color: "transparent"
+
+    property bool mediaPopupOpen: false
+    property bool brightnessPopupOpen: false
+    property bool volumePopupOpen: false
+
+    Timer {
+        id: mediaCloseTimer
+        interval: 250
+        onTriggered: bar.mediaPopupOpen = false
+    }
+
+    Timer {
+        id: brightnessCloseTimer
+        interval: 250
+        onTriggered: bar.brightnessPopupOpen = false
+    }
+
+    Timer {
+        id: volumeCloseTimer
+        interval: 250
+        onTriggered: bar.volumePopupOpen = false
+    }
+
+    mask: Region {
+        Region {
+            item: leftBlock
+        }
+
+        Region {
+            item: centerBlock
+        }
+
+        Region {
+            item: rightBlock
+        }
+
+        Region {
+            item: mediaEdge
+        }
+
+        Region {
+            item: mediaPopup
+        }
+
+        Region {
+            item: brightnessPopup
+        }
+
+        Region {
+            item: volumePopup
+        }
+    }
+
+    Rectangle {
+        id: leftBlock
+
+        x: 8
+        y: 4
+        width: leftContent.implicitWidth + 20
+        height: 32
+
+        radius: 10
+        color: Colors.md3.surface
+
+        Row {
+            id: leftContent
+
+            anchors.centerIn: parent
+            spacing: 10
+
+            IconImage {
+                width: 20
+                height: 20
+                source: "root:/assets/arch.svg"
+            }
+
+            Row {
+                spacing: 5
+
+                Repeater {
+                    model: Hyprland.workspaces
+
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: 30
+                        height: 30
+                        radius: 5
+
+                        color: modelData.active
+                            ? Colors.md3.primary
+                            : "transparent"
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            text: modelData.id
+                            color: modelData.active
+                                ? Colors.md3.on_primary
+                                : Colors.md3.on_surface
+
+                            font.family: "JetBrainsMonoNL Nerd Font Mono"
+                            font.pixelSize: 15
+                            font.bold: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+
+                            onClicked: {
+                                Hyprland.dispatch(
+                                    "workspace " + modelData.id
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        id: centerBlock
+
+        width: 500
+        height: 32
+
+        x: parent.width / 2 - width / 2
+        y: 4
+
+        radius: 10
+        color: Colors.md3.surface
+
+        Text {
+            id: windowTitle
+
+            anchors.fill: parent
+            anchors.leftMargin: 15
+            anchors.rightMargin: 15
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            text: Hyprland.activeToplevel
+                ? Hyprland.activeToplevel.title
+                : ""
+
+            color: Colors.md3.on_surface
+
+            font.family: "JetBrainsMonoNL Nerd Font Mono"
+            font.pixelSize: 15
+            font.bold: true
+
+            elide: Text.ElideRight
+        }
+    }
+
+    Rectangle {
+        id: rightBlock
+
+        x: parent.width - width - 8
+        y: 4
+        width: rightContent.implicitWidth + 20
+        height: 32
+
+        radius: 10
+        color: Colors.md3.surface
+
+        Row {
+            id: rightContent
+
+            anchors.centerIn: parent
+            spacing: 7
+
+            Tray {
+                window: bar
+            }
+
+            Brightness {
+                id: brightness
+
+                onHoveredChanged: {
+                    if (hovered) {
+                        mediaCloseTimer.stop()
+                        volumeCloseTimer.stop()
+
+                        bar.mediaPopupOpen = false
+                        bar.volumePopupOpen = false
+                        bar.brightnessPopupOpen = true
+                    } else {
+                        brightnessCloseTimer.restart()
+                    }
+                }
+            }
+
+            Volume {
+                id: volume
+
+                onHoveredChanged: {
+                    if (hovered) {
+                        mediaCloseTimer.stop()
+                        brightnessCloseTimer.stop()
+
+                        bar.mediaPopupOpen = false
+                        bar.brightnessPopupOpen = false
+                        bar.volumePopupOpen = true
+                    } else {
+                        volumeCloseTimer.restart()
+                    }
+                }
+            }
+
+            KeyboardLayout {}
+
+            Clock {}
+        }
+    }
+
+    Rectangle {
+        id: mediaEdge
+
+        x: 0
+        y: 0
+        width: 4
+        height: bar.height
+
+        color: "transparent"
+        z: 20
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    mediaCloseTimer.stop()
+                    bar.mediaPopupOpen = true
+                } else {
+                    mediaCloseTimer.restart()
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        id: mediaPopup
+
+        width: mediaContent.implicitWidth + 20
+        height: 56
+
+        x: bar.mediaPopupOpen ? 8 : -width
+        y: parent.height / 4
+
+        radius: 10
+        color: Colors.md3.surface
+
+        border.width: 1
+        border.color: Colors.md3.outline
+
+        z: 30
+
+        Behavior on x {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    mediaCloseTimer.stop()
+                    bar.mediaPopupOpen = true
+                } else {
+                    mediaCloseTimer.restart()
+                }
+            }
+        }
+
+        Media {
+            id: media
+
+            anchors.centerIn: parent
+        }
+    }
+
+    Rectangle {
+        id: brightnessPopup
+
+        width: 140
+        height: 38
+
+        x: rightBlock.x + rightContent.width
+            - brightness.width
+            - 10
+
+        y: bar.brightnessPopupOpen ? 34 : 18
+
+        radius: 8
+        color: Colors.md3.surface
+
+        opacity: bar.brightnessPopupOpen ? 1 : 0
+        scale: bar.brightnessPopupOpen ? 1 : 0.95
+
+        z: 30
+
+        Behavior on y {
+            NumberAnimation {
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 120
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: 120
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    brightnessCloseTimer.stop()
+                    bar.brightnessPopupOpen = true
+                } else {
+                    brightnessCloseTimer.restart()
+                }
+            }
+        }
+
+        Rectangle {
+            id: brightnessSlider
+
+            x: 12
+            y: 15
+
+            width: parent.width - 24
+            height: 8
+
+            radius: 4
+            color: Colors.md3.surface_variant
+
+            Rectangle {
+                width: parent.width * brightness.brightness / 100
+                height: parent.height
+
+                radius: 4
+                color: Colors.md3.primary
+            }
+
+            MouseArea {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    bottom: parent.bottom
+
+                    topMargin: -12
+                    bottomMargin: -12
+                }
+
+                onClicked: {
+                    brightness.setBrightnessValue(
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                mouseX / brightnessSlider.width * 100
+                            )
+                        )
+                    )
+                }
+
+                onPositionChanged: {
+                    if (pressed) {
+                        brightness.setBrightnessValue(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    100,
+                                    mouseX / brightnessSlider.width * 100
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 16
+                height: 16
+
+                radius: 8
+
+                x: brightnessSlider.width
+                    * brightness.brightness / 100
+                    - width / 2
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                color: Colors.md3.primary
+            }
+        }
+    }
+
+    Rectangle {
+        id: volumePopup
+
+        width: 140
+        height: 38
+
+        x: rightBlock.x + rightContent.width
+            - volume.width
+            - 10
+
+        y: bar.volumePopupOpen ? 34 : 18
+
+        radius: 8
+        color: Colors.md3.surface
+
+        opacity: bar.volumePopupOpen ? 1 : 0
+        scale: bar.volumePopupOpen ? 1 : 0.95
+
+        z: 30
+
+        Behavior on y {
+            NumberAnimation {
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 120
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: 120
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    volumeCloseTimer.stop()
+                    bar.volumePopupOpen = true
+                } else {
+                    volumeCloseTimer.restart()
+                }
+            }
+        }
+
+        Rectangle {
+            id: volumeSlider
+
+            x: 12
+            y: 15
+
+            width: parent.width - 24
+            height: 8
+
+            radius: 4
+            color: Colors.md3.surface_variant
+
+            Rectangle {
+                width: parent.width * volume.volume / 100
+                height: parent.height
+
+                radius: 4
+                color: Colors.md3.primary
+            }
+
+            MouseArea {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    bottom: parent.bottom
+
+                    topMargin: -12
+                    bottomMargin: -12
+                }
+
+                onClicked: {
+                    volume.setVolumeValue(
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                mouseX / volumeSlider.width * 100
+                            )
+                        )
+                    )
+                }
+
+                onPositionChanged: {
+                    if (pressed) {
+                        volume.setVolumeValue(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    100,
+                                    mouseX / volumeSlider.width * 100
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 16
+                height: 16
+
+                radius: 8
+
+                x: volumeSlider.width
+                    * volume.volume / 100
+                    - width / 2
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                color: Colors.md3.primary
+            }
+        }
+    }
+}
