@@ -21,7 +21,15 @@ PanelWindow {
 
     mask: Region {
         Region {
-            item: barBackground
+            item: leftBlock
+        }
+
+        Region {
+            item: centerBlock
+        }
+
+        Region {
+            item: rightBlock
         }
 
         Region {
@@ -44,9 +52,12 @@ PanelWindow {
     }
 
     Rectangle {
-        id: barBackground
+        id: leftBlock
 
-        width: parent.width
+        x: 8
+        y: 0
+
+        width: leftContent.implicitWidth + 20
         height: 40
 
         color: Colors.md3.surface
@@ -54,90 +65,113 @@ PanelWindow {
 
         z: 2
 
-        Text {
-            anchors {
-                left: parent.left
-                leftMargin: 10
-                verticalCenter: parent.verticalCenter
-            }
-
-            text: "󰣇"
-
-            color: Colors.md3.on_surface
-
-            font.family: "JetBrainsMonoNL Nerd Font Mono"
-            font.pixelSize: 40
-
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-        }
-
         Row {
-            id: workspaces
+            id: leftContent
 
             anchors {
                 left: parent.left
-                leftMargin: 40
+                right: parent.right
                 verticalCenter: parent.verticalCenter
+
+                leftMargin: 10
+                rightMargin: 10
             }
 
             spacing: 0
 
-            Repeater {
-                model: Hyprland.workspaces
+            Text {
+                width: 30
+                height: 30
 
-                delegate: Rectangle {
-                    required property var modelData
+                text: "󰣇"
 
-                    width: 30
-                    height: 30
+                color: Colors.md3.on_surface
 
-                    radius: 5
+                font.family: "JetBrainsMonoNL Nerd Font Mono"
+                font.pixelSize: 40
 
-                    color: modelData.active
-                        ? Colors.md3.primary
-                        : "transparent"
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
 
-                    Text {
-                        anchors.centerIn: parent
+            Row {
+                id: workspaces
 
-                        text: modelData.name
+                spacing: 0
+
+                Repeater {
+                    model: Hyprland.workspaces
+
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: 30
+                        height: 30
+
+                        radius: 5
 
                         color: modelData.active
-                            ? Colors.md3.on_primary
-                            : Colors.md3.on_surface
+                            ? Colors.md3.primary
+                            : "transparent"
 
-                        font.family: "JetBrainsMonoNL Nerd Font Mono"
-                        font.bold: true
-                        font.pixelSize: 15
-                    }
+                        Text {
+                            anchors.centerIn: parent
 
-                    MouseArea {
-                        anchors.fill: parent
+                            text: modelData.name
 
-                        onClicked: modelData.activate()
+                            color: modelData.active
+                                ? Colors.md3.on_primary
+                                : Colors.md3.on_surface
+
+                            font.family: "JetBrainsMonoNL Nerd Font Mono"
+                            font.bold: true
+                            font.pixelSize: 15
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+
+                            onClicked: modelData.activate()
+                        }
                     }
                 }
             }
-        }
 
-        Media {
-            id: media
+            Item {
+                width: 20
+                height: 1
+            }
 
-            anchors {
-                left: workspaces.right
-                leftMargin: 20
-                verticalCenter: parent.verticalCenter
+            Media {
+                id: media
             }
         }
+    }
+
+    Rectangle {
+        id: centerBlock
+
+        width: 500
+        height: 40
+
+        x: parent.width / 2
+            - width / 2
+            + 60
+
+        y: 0
+
+        color: Colors.md3.surface
+        radius: 10
+
+        z: 2
 
         Item {
             id: titleContainer
 
-            anchors.centerIn: parent
+            anchors.fill: parent
 
-            width: 500
-            height: 30
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
 
             clip: true
 
@@ -237,13 +271,31 @@ PanelWindow {
                 }
             }
         }
+    }
+
+    Rectangle {
+        id: rightBlock
+
+        width: rightContent.implicitWidth + 20
+        height: 40
+
+        x: parent.width - width - 8
+        y: 0
+
+        color: Colors.md3.surface
+        radius: 10
+
+        z: 2
 
         Row {
-            id: rightSide
+            id: rightContent
 
             anchors {
+                left: parent.left
                 right: parent.right
                 verticalCenter: parent.verticalCenter
+
+                leftMargin: 10
                 rightMargin: 10
             }
 
@@ -268,7 +320,6 @@ PanelWindow {
                 function onHoveredChanged() {
                     if (brightness.hovered) {
                         brightnessCloseTimer.stop()
-
                         bar.volumePopupOpen = false
                         bar.brightnessPopupOpen = true
                     } else {
@@ -287,7 +338,6 @@ PanelWindow {
                 function onHoveredChanged() {
                     if (volume.hovered) {
                         volumeCloseTimer.stop()
-
                         bar.brightnessPopupOpen = false
                         bar.volumePopupOpen = true
                     } else {
@@ -346,7 +396,7 @@ PanelWindow {
         width: 140
         height: 38
 
-        x: rightSide.x
+        x: rightBlock.x
             + brightness.x
             + brightness.width / 2
             - width / 2
@@ -422,8 +472,10 @@ PanelWindow {
 
                 height: parent.height
 
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
+                anchors {
+                    left: parent.left
+                    verticalCenter: parent.verticalCenter
+                }
 
                 radius: 4
 
@@ -482,7 +534,7 @@ PanelWindow {
         width: 140
         height: 38
 
-        x: rightSide.x
+        x: rightBlock.x
             + volume.x
             + volume.width / 2
             - width / 2
@@ -558,8 +610,10 @@ PanelWindow {
 
                 height: parent.height
 
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
+                anchors {
+                    left: parent.left
+                    verticalCenter: parent.verticalCenter
+                }
 
                 radius: 4
 
