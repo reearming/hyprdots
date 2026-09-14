@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Widgets
+import Quickshell.Services.Mpris
 
 PanelWindow {
     id: bar
@@ -21,6 +22,22 @@ PanelWindow {
     property bool mediaPopupOpen: false
     property bool brightnessPopupOpen: false
     property bool volumePopupOpen: false
+
+    property bool mediaPlaying: {
+        const players = Mpris.players.values
+
+        for (const p of players) {
+            if (p.isPlaying)
+                return true
+        }
+
+        return false
+    }
+
+    onMediaPlayingChanged: {
+        if (!mediaPlaying)
+            mediaPopupOpen = false
+    }
 
     Timer {
         id: mediaCloseTimer
@@ -49,63 +66,6 @@ PanelWindow {
 
         onTriggered: {
             bar.volumePopupOpen = false
-        }
-    }
-
-    Timer {
-        id: mediaPopupHideTimer
-
-        interval: 200
-
-        onTriggered: {
-            mediaPopup.visible = false
-        }
-    }
-
-    Timer {
-        id: brightnessPopupHideTimer
-
-        interval: 200
-
-        onTriggered: {
-            brightnessPopup.visible = false
-        }
-    }
-
-    Timer {
-        id: volumePopupHideTimer
-
-        interval: 200
-
-        onTriggered: {
-            volumePopup.visible = false
-        }
-    }
-
-    onMediaPopupOpenChanged: {
-        if (mediaPopupOpen) {
-            mediaPopupHideTimer.stop()
-            mediaPopup.visible = true
-        } else {
-            mediaPopupHideTimer.restart()
-        }
-    }
-
-    onBrightnessPopupOpenChanged: {
-        if (brightnessPopupOpen) {
-            brightnessPopupHideTimer.stop()
-            brightnessPopup.visible = true
-        } else {
-            brightnessPopupHideTimer.restart()
-        }
-    }
-
-    onVolumePopupOpenChanged: {
-        if (volumePopupOpen) {
-            volumePopupHideTimer.stop()
-            volumePopup.visible = true
-        } else {
-            volumePopupHideTimer.restart()
         }
     }
 
@@ -145,11 +105,19 @@ PanelWindow {
 
             spacing: 10
 
-            IconImage {
-                width: 20
-                height: 20
+            Text {
+                width: 30
+                height: 30
 
-                source: "root:/assets/arch.svg"
+                text: ""
+
+                color: Colors.md3.on_surface
+
+                font.family: "JetBrainsMonoNL Nerd Font Mono"
+                font.pixelSize: 45
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
             }
 
             Row {
@@ -201,6 +169,8 @@ PanelWindow {
 
     Rectangle {
         id: centerBlock
+
+        visible: Hyprland.activeToplevel !== null
 
         width: 500
         height: 40
@@ -265,44 +235,52 @@ PanelWindow {
                 window: bar
             }
 
-            Brightness {
-                id: brightness
+            Row {
+                spacing: 3
 
-                onHoveredChanged: {
-                    if (hovered) {
-                        mediaCloseTimer.stop()
-                        volumeCloseTimer.stop()
-                        brightnessCloseTimer.stop()
+                Brightness {
+                    id: brightness
 
-                        bar.mediaPopupOpen = false
-                        bar.volumePopupOpen = false
-                        bar.brightnessPopupOpen = true
-                    } else {
-                        brightnessCloseTimer.restart()
+                    onHoveredChanged: {
+                        if (hovered) {
+                            mediaCloseTimer.stop()
+                            volumeCloseTimer.stop()
+                            brightnessCloseTimer.stop()
+
+                            bar.mediaPopupOpen = false
+                            bar.volumePopupOpen = false
+                            bar.brightnessPopupOpen = true
+                        } else {
+                            brightnessCloseTimer.restart()
+                        }
+                    }
+                }
+
+                Volume {
+                    id: volume
+
+                    onHoveredChanged: {
+                        if (hovered) {
+                            mediaCloseTimer.stop()
+                            brightnessCloseTimer.stop()
+                            volumeCloseTimer.stop()
+
+                            bar.mediaPopupOpen = false
+                            bar.brightnessPopupOpen = false
+                            bar.volumePopupOpen = true
+                        } else {
+                            volumeCloseTimer.restart()
+                        }
                     }
                 }
             }
 
-            Volume {
-                id: volume
+            Row {
+                spacing: 12
 
-                onHoveredChanged: {
-                    if (hovered) {
-                        mediaCloseTimer.stop()
-                        brightnessCloseTimer.stop()
-                        volumeCloseTimer.stop()
-
-                        bar.mediaPopupOpen = false
-                        bar.brightnessPopupOpen = false
-                        bar.volumePopupOpen = true
-                    } else {
-                        volumeCloseTimer.restart()
-                    }
-                }
+                KeyboardLayout {}
+                Clock {}
             }
-
-            KeyboardLayout {}
-            Clock {}
         }
     }
 
@@ -338,7 +316,7 @@ PanelWindow {
 
             HoverHandler {
                 onHoveredChanged: {
-                    if (hovered) {
+                    if (hovered && bar.mediaPlaying) {
                         mediaCloseTimer.stop()
                         bar.mediaPopupOpen = true
                     } else {
@@ -360,7 +338,7 @@ PanelWindow {
         width: 360
         height: 150
 
-        visible: false
+        visible: true
 
         color: "transparent"
 
@@ -370,7 +348,9 @@ PanelWindow {
             width: parent.width
             height: parent.height
 
-            x: bar.mediaPopupOpen ? 0 : -width
+            x: bar.mediaPopupOpen && bar.mediaPlaying
+                ? 0
+                : -width
 
             radius: 10
             color: Colors.md3.surface
@@ -389,7 +369,7 @@ PanelWindow {
 
             HoverHandler {
                 onHoveredChanged: {
-                    if (hovered) {
+                    if (hovered && bar.mediaPlaying) {
                         mediaCloseTimer.stop()
                         bar.mediaPopupOpen = true
                     } else {
@@ -414,8 +394,7 @@ PanelWindow {
             rightBlock.x
             + brightness.x
             + brightness.width / 2
-            - width / 2
-            + 12
+            + 10
 
         anchor.rect.y:
             rightBlock.y + rightBlock.height
@@ -423,18 +402,17 @@ PanelWindow {
         width: 140
         height: 38
 
-        visible: false
+        visible: true
 
         color: "transparent"
 
         Rectangle {
             id: brightnessPopupContent
 
-            x: 0
-            y: bar.brightnessPopupOpen ? 0 : -height
-
             width: parent.width
             height: parent.height
+
+            y: bar.brightnessPopupOpen ? 0 : -height
 
             radius: 8
             color: Colors.md3.surface
@@ -545,8 +523,7 @@ PanelWindow {
             rightBlock.x
             + volume.x
             + volume.width / 2
-            - width / 2
-            + 12
+            + 10
 
         anchor.rect.y:
             rightBlock.y + rightBlock.height
@@ -554,18 +531,17 @@ PanelWindow {
         width: 140
         height: 38
 
-        visible: false
+        visible: true
 
         color: "transparent"
 
         Rectangle {
             id: volumePopupContent
 
-            x: 0
-            y: bar.volumePopupOpen ? 0 : -height
-
             width: parent.width
             height: parent.height
+
+            y: bar.volumePopupOpen ? 0 : -height
 
             radius: 8
             color: Colors.md3.surface
