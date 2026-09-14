@@ -52,6 +52,63 @@ PanelWindow {
         }
     }
 
+    Timer {
+        id: mediaPopupHideTimer
+
+        interval: 200
+
+        onTriggered: {
+            mediaPopup.visible = false
+        }
+    }
+
+    Timer {
+        id: brightnessPopupHideTimer
+
+        interval: 200
+
+        onTriggered: {
+            brightnessPopup.visible = false
+        }
+    }
+
+    Timer {
+        id: volumePopupHideTimer
+
+        interval: 200
+
+        onTriggered: {
+            volumePopup.visible = false
+        }
+    }
+
+    onMediaPopupOpenChanged: {
+        if (mediaPopupOpen) {
+            mediaPopupHideTimer.stop()
+            mediaPopup.visible = true
+        } else {
+            mediaPopupHideTimer.restart()
+        }
+    }
+
+    onBrightnessPopupOpenChanged: {
+        if (brightnessPopupOpen) {
+            brightnessPopupHideTimer.stop()
+            brightnessPopup.visible = true
+        } else {
+            brightnessPopupHideTimer.restart()
+        }
+    }
+
+    onVolumePopupOpenChanged: {
+        if (volumePopupOpen) {
+            volumePopupHideTimer.stop()
+            volumePopup.visible = true
+        } else {
+            volumePopupHideTimer.restart()
+        }
+    }
+
     mask: Region {
         Region {
             item: leftBlock
@@ -303,7 +360,7 @@ PanelWindow {
         width: 360
         height: 150
 
-        visible: bar.mediaPopupOpen
+        visible: false
 
         color: "transparent"
 
@@ -366,18 +423,31 @@ PanelWindow {
         width: 140
         height: 38
 
-        visible: bar.brightnessPopupOpen
+        visible: false
 
         color: "transparent"
 
         Rectangle {
-            anchors.fill: parent
+            id: brightnessPopupContent
+
+            x: 0
+            y: bar.brightnessPopupOpen ? 0 : -height
+
+            width: parent.width
+            height: parent.height
 
             radius: 8
             color: Colors.md3.surface
 
             border.width: 2
             border.color: Colors.md3.primary
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             HoverHandler {
                 onHoveredChanged: {
@@ -484,18 +554,31 @@ PanelWindow {
         width: 140
         height: 38
 
-        visible: bar.volumePopupOpen
+        visible: false
 
         color: "transparent"
 
         Rectangle {
-            anchors.fill: parent
+            id: volumePopupContent
+
+            x: 0
+            y: bar.volumePopupOpen ? 0 : -height
+
+            width: parent.width
+            height: parent.height
 
             radius: 8
             color: Colors.md3.surface
 
             border.width: 2
             border.color: Colors.md3.primary
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             HoverHandler {
                 onHoveredChanged: {
@@ -584,4 +667,3 @@ PanelWindow {
         }
     }
 }
-
