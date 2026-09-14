@@ -1,10 +1,9 @@
 //@ pragma UseQApplication
 
 import QtQuick
-import QtQuick.Window
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
+import Quickshell.Widgets
 
 PanelWindow {
     id: bar
@@ -13,10 +12,9 @@ PanelWindow {
         top: true
         left: true
         right: true
-        bottom: true
     }
 
-    implicitHeight: screen.height
+    implicitHeight: 100
     exclusiveZone: 40
     color: "transparent"
 
@@ -27,7 +25,7 @@ PanelWindow {
     Timer {
         id: mediaCloseTimer
 
-        interval: 250
+        interval: 500
 
         onTriggered: {
             bar.mediaPopupOpen = false
@@ -72,30 +70,11 @@ PanelWindow {
         }
 
         Region {
-            x: mediaPopup.x
-            y: mediaPopup.y
-            width: mediaPopup.width
-            height: bar.mediaPopupOpen
-                ? mediaPopup.height
-                : 0
+            item: brightnessPopup
         }
 
         Region {
-            x: brightnessPopup.x
-            y: brightnessPopup.y
-            width: brightnessPopup.width
-            height: bar.brightnessPopupOpen
-                ? brightnessPopup.height
-                : 0
-        }
-
-        Region {
-            x: volumePopup.x
-            y: volumePopup.y
-            width: volumePopup.width
-            height: bar.volumePopupOpen
-                ? volumePopup.height
-                : 0
+            item: volumePopup
         }
     }
 
@@ -111,6 +90,9 @@ PanelWindow {
         radius: 10
         color: Colors.md3.surface
 
+        border.width: 2
+        border.color: Colors.md3.primary
+
         Row {
             id: leftContent
 
@@ -118,23 +100,15 @@ PanelWindow {
 
             spacing: 10
 
-            Text {
+            IconImage {
                 width: 20
-                height: 30
+                height: 20
 
-                text: "󰣇"
-
-                color: Colors.md3.on_surface
-
-                font.family: "JetBrainsMonoNL Nerd Font Mono"
-                font.pixelSize: 22
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
+                source: "root:/assets/arch.svg"
             }
 
             Row {
-                spacing: 0
+                spacing: 5
 
                 Repeater {
                     model: Hyprland.workspaces
@@ -154,22 +128,24 @@ PanelWindow {
                         Text {
                             anchors.centerIn: parent
 
-                            text: modelData.name
+                            text: modelData.id
 
                             color: modelData.active
                                 ? Colors.md3.on_primary
                                 : Colors.md3.on_surface
 
                             font.family: "JetBrainsMonoNL Nerd Font Mono"
-                            font.bold: true
                             font.pixelSize: 15
+                            font.bold: true
                         }
 
                         MouseArea {
                             anchors.fill: parent
 
                             onClicked: {
-                                modelData.activate()
+                                Hyprland.dispatch(
+                                    "workspace " + modelData.id
+                                )
                             }
                         }
                     }
@@ -190,11 +166,19 @@ PanelWindow {
         radius: 10
         color: Colors.md3.surface
 
+        border.width: 2
+        border.color: Colors.md3.primary
+
         Text {
+            id: windowTitle
+
             anchors.fill: parent
 
             anchors.leftMargin: 15
             anchors.rightMargin: 15
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
 
             text: Hyprland.activeToplevel
                 ? Hyprland.activeToplevel.title
@@ -203,11 +187,8 @@ PanelWindow {
             color: Colors.md3.on_surface
 
             font.family: "JetBrainsMonoNL Nerd Font Mono"
-            font.bold: true
             font.pixelSize: 15
-
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
 
             elide: Text.ElideRight
         }
@@ -224,6 +205,9 @@ PanelWindow {
 
         radius: 10
         color: Colors.md3.surface
+
+        border.width: 2
+        border.color: Colors.md3.primary
 
         Row {
             id: rightContent
@@ -271,7 +255,6 @@ PanelWindow {
             }
 
             KeyboardLayout {}
-
             Clock {}
         }
     }
@@ -286,13 +269,13 @@ PanelWindow {
         height: bar.height
 
         color: "transparent"
-
         z: 20
 
         HoverHandler {
             onHoveredChanged: {
                 if (hovered) {
                     mediaCloseTimer.stop()
+
                     bar.mediaPopupOpen = true
                 } else {
                     mediaCloseTimer.restart()
@@ -301,77 +284,40 @@ PanelWindow {
         }
     }
 
-    Rectangle {
+    PopupWindow {
         id: mediaPopup
 
-        clip: true
+        anchor.window: bar
+
+        anchor.rect.x: 8
+        anchor.rect.y: bar.screen.height / 4
 
         width: 360
         height: 150
 
-        x: mediaPopupOpen ? 10 : -width
-        y: screen.height / 4
+        visible: bar.mediaPopupOpen
 
-        color: Colors.md3.surface
-        radius: 10
-
-        border.width: 2
-        border.color: Colors.md3.primary
-
-        Behavior on x {
-            NumberAnimation {
-                duration: 250
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        Media {
-            anchors.fill: parent
-            anchors.margins: 12
-        }
-    }
+        color: "transparent"
 
         Rectangle {
-            id: brightnessPopup
+            id: mediaPopupContent
 
-            width: 140
-            height: 38
+            width: parent.width
+            height: parent.height
 
-            x: rightBlock.x
-                + rightContent.x
-                + brightness.x
-                + brightness.width / 2
-                - width / 2
+            x: bar.mediaPopupOpen ? 0 : -width
 
-            y: bar.brightnessPopupOpen
-                ? 34
-                : 18
-
-            radius: 8
-
+            radius: 10
             color: Colors.md3.surface
 
-            opacity: bar.brightnessPopupOpen ? 1 : 0
-            scale: bar.brightnessPopupOpen ? 1 : 0.95
+            border.width: 2
+            border.color: Colors.md3.primary
 
-            z: 30
+            clip: true
 
-            Behavior on y {
+            Behavior on x {
                 NumberAnimation {
-                    duration: 150
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 120
-                }
-            }
-
-            Behavior on scale {
-                NumberAnimation {
-                    duration: 120
+                    duration: 200
                     easing.type: Easing.OutCubic
                 }
             }
@@ -379,85 +325,146 @@ PanelWindow {
             HoverHandler {
                 onHoveredChanged: {
                     if (hovered) {
-                        brightnessCloseTimer.stop()
-                        bar.brightnessPopupOpen = true
+                        mediaCloseTimer.stop()
+                        bar.mediaPopupOpen = true
                     } else {
-                        brightnessCloseTimer.restart()
+                        mediaCloseTimer.restart()
+                    }
+                }
+            }
+
+            Media {
+                anchors.fill: parent
+                anchors.margins: 12
+            }
+        }
+    }
+
+    Rectangle {
+        id: brightnessPopup
+
+        width: 140
+        height: 38
+
+        x: rightBlock.x + rightBlock.width - width
+
+        y: bar.brightnessPopupOpen ? 34 : 18
+
+        radius: 8
+        color: Colors.md3.surface
+
+        border.width: 2
+        border.color: Colors.md3.primary
+
+        opacity: bar.brightnessPopupOpen ? 1 : 0
+        scale: bar.brightnessPopupOpen ? 1 : 0.95
+
+        z: 30
+
+        Behavior on y {
+            NumberAnimation {
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 120
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: 120
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    brightnessCloseTimer.stop()
+                    bar.brightnessPopupOpen = true
+                } else {
+                    brightnessCloseTimer.restart()
+                }
+            }
+        }
+
+        Rectangle {
+            id: brightnessSlider
+
+            x: 12
+            y: 15
+
+            width: parent.width - 24
+            height: 8
+
+            radius: 4
+            color: Colors.md3.surface_variant
+
+            Rectangle {
+                width: parent.width * brightness.brightness / 100
+                height: parent.height
+
+                radius: 4
+                color: Colors.md3.primary
+            }
+
+            MouseArea {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    bottom: parent.bottom
+
+                    topMargin: -12
+                    bottomMargin: -12
+                }
+
+                onClicked: {
+                    brightness.setBrightnessValue(
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                mouseX / brightnessSlider.width * 100
+                            )
+                        )
+                    )
+                }
+
+                onPositionChanged: {
+                    if (pressed) {
+                        brightness.setBrightnessValue(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    100,
+                                    mouseX / brightnessSlider.width * 100
+                                )
+                            )
+                        )
                     }
                 }
             }
 
             Rectangle {
-                id: brightnessSlider
+                width: 16
+                height: 16
 
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    verticalCenter: parent.verticalCenter
+                radius: 8
 
-                    leftMargin: 12
-                    rightMargin: 12
-                }
+                x: brightnessSlider.width
+                    * brightness.brightness / 100
+                    - width / 2
 
-                height: 8
-                radius: 4
+                anchors.verticalCenter: parent.verticalCenter
 
-                color: Colors.md3.surface_variant
-
-                Rectangle {
-                    width: brightnessSlider.width
-                        * brightness.brightness
-                        / 100
-
-                    height: parent.height
-
-                    radius: 4
-
-                    color: Colors.md3.primary
-                }
-
-                Rectangle {
-                    width: 16
-                    height: 16
-
-                    radius: 8
-
-                    x: brightnessSlider.width
-                        * brightness.brightness
-                        / 100
-                        - width / 2
-
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    color: Colors.md3.primary
-                }
-
-                MouseArea {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
-
-                        topMargin: -12
-                        bottomMargin: -12
-                    }
-
-                    onPressed: {
-                        brightness.setBrightnessValue(
-                            mouseX / brightnessSlider.width * 100
-                        )
-                    }
-
-                    onPositionChanged: {
-                        if (pressed) {
-                            brightness.setBrightnessValue(
-                                mouseX / brightnessSlider.width * 100
-                            )
-                        }
-                    }
-                }
+                color: Colors.md3.primary
             }
+        }
     }
 
     Rectangle {
@@ -466,19 +473,15 @@ PanelWindow {
         width: 140
         height: 38
 
-        x: rightBlock.x
-            + rightContent.x
-            + volume.x
-            + volume.width / 2
-            - width / 2
+        x: rightBlock.x + rightBlock.width - width
 
-        y: bar.volumePopupOpen
-            ? 34
-            : 18
+        y: bar.volumePopupOpen ? 34 : 18
 
         radius: 8
-
         color: Colors.md3.surface
+
+        border.width: 2
+        border.color: Colors.md3.primary
 
         opacity: bar.volumePopupOpen ? 1 : 0
         scale: bar.volumePopupOpen ? 1 : 0.95
@@ -519,45 +522,20 @@ PanelWindow {
         Rectangle {
             id: volumeSlider
 
-            anchors {
-                left: parent.left
-                right: parent.right
-                verticalCenter: parent.verticalCenter
+            x: 12
+            y: 15
 
-                leftMargin: 12
-                rightMargin: 12
-            }
-
+            width: parent.width - 24
             height: 8
-            radius: 4
 
+            radius: 4
             color: Colors.md3.surface_variant
 
             Rectangle {
-                width: volumeSlider.width
-                    * volume.volume
-                    / 100
-
+                width: parent.width * volume.volume / 100
                 height: parent.height
 
                 radius: 4
-
-                color: Colors.md3.primary
-            }
-
-            Rectangle {
-                width: 16
-                height: 16
-
-                radius: 8
-
-                x: volumeSlider.width
-                    * volume.volume
-                    / 100
-                    - width / 2
-
-                anchors.verticalCenter: parent.verticalCenter
-
                 color: Colors.md3.primary
             }
 
@@ -572,19 +550,46 @@ PanelWindow {
                     bottomMargin: -12
                 }
 
-                onPressed: {
+                onClicked: {
                     volume.setVolumeValue(
-                        mouseX / volumeSlider.width * 100
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                mouseX / volumeSlider.width * 100
+                            )
+                        )
                     )
                 }
 
                 onPositionChanged: {
                     if (pressed) {
                         volume.setVolumeValue(
-                            mouseX / volumeSlider.width * 100
+                            Math.max(
+                                0,
+                                Math.min(
+                                    100,
+                                    mouseX / volumeSlider.width * 100
+                                )
+                            )
                         )
                     }
                 }
+            }
+
+            Rectangle {
+                width: 16
+                height: 16
+
+                radius: 8
+
+                x: volumeSlider.width
+                    * volume.volume / 100
+                    - width / 2
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                color: Colors.md3.primary
             }
         }
     }
