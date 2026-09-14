@@ -24,20 +24,32 @@ PanelWindow {
 
     Timer {
         id: mediaCloseTimer
-        interval: 250
-        onTriggered: bar.mediaPopupOpen = false
+
+        interval: 500
+
+        onTriggered: {
+            bar.mediaPopupOpen = false
+        }
     }
 
     Timer {
         id: brightnessCloseTimer
+
         interval: 250
-        onTriggered: bar.brightnessPopupOpen = false
+
+        onTriggered: {
+            bar.brightnessPopupOpen = false
+        }
     }
 
     Timer {
         id: volumeCloseTimer
+
         interval: 250
-        onTriggered: bar.volumePopupOpen = false
+
+        onTriggered: {
+            bar.volumePopupOpen = false
+        }
     }
 
     mask: Region {
@@ -52,22 +64,6 @@ PanelWindow {
         Region {
             item: rightBlock
         }
-
-        Region {
-            item: mediaEdge
-        }
-
-        Region {
-            item: mediaPopup
-        }
-
-        Region {
-            item: brightnessPopup
-        }
-
-        Region {
-            item: volumePopup
-        }
     }
 
     Rectangle {
@@ -75,21 +71,27 @@ PanelWindow {
 
         x: 8
         y: 4
+
         width: leftContent.implicitWidth + 20
-        height: 32
+        height: 40
 
         radius: 10
         color: Colors.md3.surface
+
+        border.width: 2
+        border.color: Colors.md3.primary
 
         Row {
             id: leftContent
 
             anchors.centerIn: parent
+
             spacing: 10
 
             IconImage {
                 width: 20
                 height: 20
+
                 source: "root:/assets/arch.svg"
             }
 
@@ -104,6 +106,7 @@ PanelWindow {
 
                         width: 30
                         height: 30
+
                         radius: 5
 
                         color: modelData.active
@@ -114,6 +117,7 @@ PanelWindow {
                             anchors.centerIn: parent
 
                             text: modelData.id
+
                             color: modelData.active
                                 ? Colors.md3.on_primary
                                 : Colors.md3.on_surface
@@ -142,7 +146,7 @@ PanelWindow {
         id: centerBlock
 
         width: 500
-        height: 32
+        height: 40
 
         x: parent.width / 2 - width / 2
         y: 4
@@ -150,10 +154,14 @@ PanelWindow {
         radius: 10
         color: Colors.md3.surface
 
+        border.width: 2
+        border.color: Colors.md3.primary
+
         Text {
             id: windowTitle
 
             anchors.fill: parent
+
             anchors.leftMargin: 15
             anchors.rightMargin: 15
 
@@ -179,16 +187,21 @@ PanelWindow {
 
         x: parent.width - width - 8
         y: 4
+
         width: rightContent.implicitWidth + 20
-        height: 32
+        height: 40
 
         radius: 10
         color: Colors.md3.surface
+
+        border.width: 2
+        border.color: Colors.md3.primary
 
         Row {
             id: rightContent
 
             anchors.centerIn: parent
+
             spacing: 7
 
             Tray {
@@ -202,6 +215,7 @@ PanelWindow {
                     if (hovered) {
                         mediaCloseTimer.stop()
                         volumeCloseTimer.stop()
+                        brightnessCloseTimer.stop()
 
                         bar.mediaPopupOpen = false
                         bar.volumePopupOpen = false
@@ -219,6 +233,7 @@ PanelWindow {
                     if (hovered) {
                         mediaCloseTimer.stop()
                         brightnessCloseTimer.stop()
+                        volumeCloseTimer.stop()
 
                         bar.mediaPopupOpen = false
                         bar.brightnessPopupOpen = false
@@ -230,172 +245,183 @@ PanelWindow {
             }
 
             KeyboardLayout {}
-
             Clock {}
         }
     }
 
-    Rectangle {
-        id: mediaEdge
+    PanelWindow {
+        id: mediaTrigger
 
-        x: 0
-        y: 0
-        width: 4
-        height: bar.height
+        anchors {
+            top: true
+            left: true
+        }
+
+        implicitWidth: 8
+        implicitHeight: screen.height
+
+        exclusiveZone: 0
 
         color: "transparent"
-        z: 20
 
-        HoverHandler {
-            onHoveredChanged: {
-                if (hovered) {
-                    mediaCloseTimer.stop()
-                    bar.mediaPopupOpen = true
-                } else {
-                    mediaCloseTimer.restart()
+        mask: Region {
+            item: mediaTriggerArea
+        }
+
+        Rectangle {
+            id: mediaTriggerArea
+
+            x: 0
+            y: screen.height / 4 - 50
+
+            width: 8
+            height: 150
+
+            color: "transparent"
+
+            HoverHandler {
+                onHoveredChanged: {
+                    if (hovered) {
+                        mediaCloseTimer.stop()
+                        bar.mediaPopupOpen = true
+                    } else {
+                        mediaCloseTimer.restart()
+                    }
                 }
             }
         }
     }
 
-    Rectangle {
+    PopupWindow {
         id: mediaPopup
 
-        width: mediaContent.implicitWidth + 20
-        height: 56
+        anchor.window: bar
 
-        x: bar.mediaPopupOpen ? 8 : -width
-        y: parent.height / 4
+        anchor.rect.x: 8
+        anchor.rect.y: bar.screen.height / 4
 
-        radius: 10
-        color: Colors.md3.surface
+        width: 360
+        height: 150
 
-        border.width: 1
-        border.color: Colors.md3.outline
+        visible: bar.mediaPopupOpen
 
-        z: 30
+        color: "transparent"
 
-        Behavior on x {
-            NumberAnimation {
-                duration: 180
-                easing.type: Easing.OutCubic
-            }
-        }
+        Rectangle {
+            id: mediaPopupContent
 
-        HoverHandler {
-            onHoveredChanged: {
-                if (hovered) {
-                    mediaCloseTimer.stop()
-                    bar.mediaPopupOpen = true
-                } else {
-                    mediaCloseTimer.restart()
+            width: parent.width
+            height: parent.height
+
+            x: bar.mediaPopupOpen ? 0 : -width
+
+            radius: 10
+            color: Colors.md3.surface
+
+            border.width: 2
+            border.color: Colors.md3.primary
+
+            clip: true
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
                 }
             }
-        }
 
-        Media {
-            id: media
+            HoverHandler {
+                onHoveredChanged: {
+                    if (hovered) {
+                        mediaCloseTimer.stop()
+                        bar.mediaPopupOpen = true
+                    } else {
+                        mediaCloseTimer.restart()
+                    }
+                }
+            }
 
-            anchors.centerIn: parent
+            Media {
+                anchors.fill: parent
+                anchors.margins: 12
+            }
         }
     }
 
-    Rectangle {
+    PopupWindow {
         id: brightnessPopup
+
+        anchor.window: bar
+
+        anchor.rect.x:
+            rightBlock.x
+            + brightness.x
+            + brightness.width / 2
+            - width / 2
+            + 12
+
+        anchor.rect.y:
+            rightBlock.y + rightBlock.height
 
         width: 140
         height: 38
 
-        x: rightBlock.x + rightContent.width
-            - brightness.width
-            - 10
+        visible: bar.brightnessPopupOpen
 
-        y: bar.brightnessPopupOpen ? 34 : 18
-
-        radius: 8
-        color: Colors.md3.surface
-
-        opacity: bar.brightnessPopupOpen ? 1 : 0
-        scale: bar.brightnessPopupOpen ? 1 : 0.95
-
-        z: 30
-
-        Behavior on y {
-            NumberAnimation {
-                duration: 150
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 120
-            }
-        }
-
-        Behavior on scale {
-            NumberAnimation {
-                duration: 120
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        HoverHandler {
-            onHoveredChanged: {
-                if (hovered) {
-                    brightnessCloseTimer.stop()
-                    bar.brightnessPopupOpen = true
-                } else {
-                    brightnessCloseTimer.restart()
-                }
-            }
-        }
+        color: "transparent"
 
         Rectangle {
-            id: brightnessSlider
+            anchors.fill: parent
 
-            x: 12
-            y: 15
+            radius: 8
+            color: Colors.md3.surface
 
-            width: parent.width - 24
-            height: 8
+            border.width: 2
+            border.color: Colors.md3.primary
 
-            radius: 4
-            color: Colors.md3.surface_variant
-
-            Rectangle {
-                width: parent.width * brightness.brightness / 100
-                height: parent.height
-
-                radius: 4
-                color: Colors.md3.primary
+            HoverHandler {
+                onHoveredChanged: {
+                    if (hovered) {
+                        brightnessCloseTimer.stop()
+                        bar.brightnessPopupOpen = true
+                    } else {
+                        brightnessCloseTimer.restart()
+                    }
+                }
             }
 
-            MouseArea {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    top: parent.top
-                    bottom: parent.bottom
+            Rectangle {
+                id: brightnessSlider
 
-                    topMargin: -12
-                    bottomMargin: -12
+                x: 12
+                y: 15
+
+                width: parent.width - 24
+                height: 8
+
+                radius: 4
+                color: Colors.md3.surface_variant
+
+                Rectangle {
+                    width: parent.width * brightness.brightness / 100
+                    height: parent.height
+
+                    radius: 4
+                    color: Colors.md3.primary
                 }
 
-                onClicked: {
-                    brightness.setBrightnessValue(
-                        Math.max(
-                            0,
-                            Math.min(
-                                100,
-                                mouseX / brightnessSlider.width * 100
-                            )
-                        )
-                    )
-                }
+                MouseArea {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
 
-                onPositionChanged: {
-                    if (pressed) {
+                        topMargin: -12
+                        bottomMargin: -12
+                    }
+
+                    onClicked: {
                         brightness.setBrightnessValue(
                             Math.max(
                                 0,
@@ -406,122 +432,114 @@ PanelWindow {
                             )
                         )
                     }
+
+                    onPositionChanged: {
+                        if (pressed) {
+                            brightness.setBrightnessValue(
+                                Math.max(
+                                    0,
+                                    Math.min(
+                                        100,
+                                        mouseX / brightnessSlider.width * 100
+                                    )
+                                )
+                            )
+                        }
+                    }
                 }
-            }
 
-            Rectangle {
-                width: 16
-                height: 16
+                Rectangle {
+                    width: 16
+                    height: 16
 
-                radius: 8
+                    radius: 8
 
-                x: brightnessSlider.width
-                    * brightness.brightness / 100
-                    - width / 2
+                    x: brightnessSlider.width
+                        * brightness.brightness / 100
+                        - width / 2
 
-                anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenter: parent.verticalCenter
 
-                color: Colors.md3.primary
+                    color: Colors.md3.primary
+                }
             }
         }
     }
 
-    Rectangle {
+    PopupWindow {
         id: volumePopup
+
+        anchor.window: bar
+
+        anchor.rect.x:
+            rightBlock.x
+            + volume.x
+            + volume.width / 2
+            - width / 2
+            + 12
+
+        anchor.rect.y:
+            rightBlock.y + rightBlock.height
 
         width: 140
         height: 38
 
-        x: rightBlock.x + rightContent.width
-            - volume.width
-            - 10
+        visible: bar.volumePopupOpen
 
-        y: bar.volumePopupOpen ? 34 : 18
-
-        radius: 8
-        color: Colors.md3.surface
-
-        opacity: bar.volumePopupOpen ? 1 : 0
-        scale: bar.volumePopupOpen ? 1 : 0.95
-
-        z: 30
-
-        Behavior on y {
-            NumberAnimation {
-                duration: 150
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 120
-            }
-        }
-
-        Behavior on scale {
-            NumberAnimation {
-                duration: 120
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        HoverHandler {
-            onHoveredChanged: {
-                if (hovered) {
-                    volumeCloseTimer.stop()
-                    bar.volumePopupOpen = true
-                } else {
-                    volumeCloseTimer.restart()
-                }
-            }
-        }
+        color: "transparent"
 
         Rectangle {
-            id: volumeSlider
+            anchors.fill: parent
 
-            x: 12
-            y: 15
+            radius: 8
+            color: Colors.md3.surface
 
-            width: parent.width - 24
-            height: 8
+            border.width: 2
+            border.color: Colors.md3.primary
 
-            radius: 4
-            color: Colors.md3.surface_variant
-
-            Rectangle {
-                width: parent.width * volume.volume / 100
-                height: parent.height
-
-                radius: 4
-                color: Colors.md3.primary
+            HoverHandler {
+                onHoveredChanged: {
+                    if (hovered) {
+                        volumeCloseTimer.stop()
+                        bar.volumePopupOpen = true
+                    } else {
+                        volumeCloseTimer.restart()
+                    }
+                }
             }
 
-            MouseArea {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    top: parent.top
-                    bottom: parent.bottom
+            Rectangle {
+                id: volumeSlider
 
-                    topMargin: -12
-                    bottomMargin: -12
+                x: 12
+                y: 15
+
+                width: parent.width - 24
+                height: 8
+
+                radius: 4
+                color: Colors.md3.surface_variant
+
+                Rectangle {
+                    width: parent.width * volume.volume / 100
+                    height: parent.height
+
+                    radius: 4
+                    color: Colors.md3.primary
                 }
 
-                onClicked: {
-                    volume.setVolumeValue(
-                        Math.max(
-                            0,
-                            Math.min(
-                                100,
-                                mouseX / volumeSlider.width * 100
-                            )
-                        )
-                    )
-                }
+                MouseArea {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
 
-                onPositionChanged: {
-                    if (pressed) {
+                        topMargin: -12
+                        bottomMargin: -12
+                    }
+
+                    onClicked: {
                         volume.setVolumeValue(
                             Math.max(
                                 0,
@@ -532,23 +550,38 @@ PanelWindow {
                             )
                         )
                     }
+
+                    onPositionChanged: {
+                        if (pressed) {
+                            volume.setVolumeValue(
+                                Math.max(
+                                    0,
+                                    Math.min(
+                                        100,
+                                        mouseX / volumeSlider.width * 100
+                                    )
+                                )
+                            )
+                        }
+                    }
                 }
-            }
 
-            Rectangle {
-                width: 16
-                height: 16
+                Rectangle {
+                    width: 16
+                    height: 16
 
-                radius: 8
+                    radius: 8
 
-                x: volumeSlider.width
-                    * volume.volume / 100
-                    - width / 2
+                    x: volumeSlider.width
+                        * volume.volume / 100
+                        - width / 2
 
-                anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenter: parent.verticalCenter
 
-                color: Colors.md3.primary
+                    color: Colors.md3.primary
+                }
             }
         }
     }
 }
+

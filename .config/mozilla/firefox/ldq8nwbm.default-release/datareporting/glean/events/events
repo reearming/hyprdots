@@ -1,0 +1,7 @@
+{"timestamp":832711,"category":"tab","name":"interaction","extra":{"action":"activate","source":"tab_strip","glean_timestamp":"1789411058435","tab_count":"1","layout":"horizontal"}}
+{"timestamp":833887,"category":"tab","name":"interaction","extra":{"tab_count":"1","source":"tab_strip","action":"activate","glean_timestamp":"1789411059611","layout":"horizontal"}}
+{"timestamp":874528,"category":"tab","name":"interaction","extra":{"layout":"horizontal","tab_count":"1","action":"activate","source":"keyboard","glean_timestamp":"1789411100251"}}
+{"timestamp":879156,"category":"tab","name":"interaction","extra":{"action":"activate","source":"tab_strip","tab_count":"1","layout":"horizontal","glean_timestamp":"1789411104880"}}
+{"timestamp":969800,"category":"tab","name":"interaction","extra":{"action":"activate","source":"keyboard","layout":"horizontal","tab_count":"1","glean_timestamp":"1789411195523"}}
+{"timestamp":972338,"category":"tab","name":"interaction","extra":{"source":"tab_strip","action":"activate","layout":"horizontal","glean_timestamp":"1789411198062","tab_count":"1"}}
+{"timestamp":1063518,"category":"tab","name":"interaction","extra":{"tab_count":"1","glean_timestamp":"1789411289241","layout":"horizontal","action":"activate","source":"tab_strip"}}

@@ -1,7 +1,7 @@
 {
-  "blink.cmp": { "branch": "main", "commit": "49d39fda6350d7f789d1da1053e86c9e256f8108" },
+  "blink.cmp": { "branch": "main", "commit": "473c928d8b9b5b3f638cd085a01899972cf205c6" },
   "blink.lib": { "branch": "main", "commit": "fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa" },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
-  "matugen.nvim": { "branch": "main", "commit": "a597e06c03df4b28f2fa8dca62020cfbca888528" },
-  "nvim-treesitter": { "branch": "main", "commit": "5cb0114e6242625db56dd6440e945ed1ece10bc7" }
+  "matugen.nvim": { "branch": "main", "commit": "914d1041693cf61bdd495eff5de770d48b6e79c5" },
+  "nvim-treesitter": { "branch": "main", "commit": "9a168f6357ed21c3a636e1727bc7d382abc451b8" }
 }

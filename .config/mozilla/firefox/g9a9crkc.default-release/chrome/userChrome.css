@@ -1,19 +1,19 @@
 :root {
-    --matugen-surface: #111418;
-    --matugen-surface-container: #1d2024;
-    --matugen-surface-container-high: #272a2f;
-    --matugen-surface-container-highest: #32353a;
+    --matugen-surface: #161217;
+    --matugen-surface-container: #221e24;
+    --matugen-surface-container-high: #2d282e;
+    --matugen-surface-container-highest: #383339;
 
-    --matugen-on-surface: #e1e2e8;
-    --matugen-on-surface-variant: #c3c6cf;
+    --matugen-on-surface: #e9e0e7;
+    --matugen-on-surface-variant: #cec3ce;
 
-    --matugen-primary: #a3c9fe;
-    --matugen-on-primary: #00315b;
+    --matugen-primary: #e0b8f5;
+    --matugen-on-primary: #422255;
 
-    --matugen-secondary: #bbc7db;
-    --matugen-on-secondary: #263141;
+    --matugen-secondary: #d3c1d8;
+    --matugen-on-secondary: #382c3e;
 
-    --matugen-outline: #8d9199;
+    --matugen-outline: #978e98;
 }
 
 

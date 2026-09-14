@@ -75,7 +75,7 @@ require("lazy").setup({
         },
 
         build = function()
-            require("blink.cmp").build():wait()
+            require("blink.cmp").build():pwait()
         end,
 
         opts = {

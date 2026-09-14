@@ -15,7 +15,7 @@ output_path = "~/.config/mozilla/firefox/g9a9crkc.default-release/chrome/colors.
 
 [templates.firefox]
 input_path = "./templates/firefox-userchrome.css"
-output_path = "~/.config/mozilla/firefox/g9a9crkc.default-release/chrome/userChrome.css"
+output_path = "~/.config/mozilla/firefox/ldq8nwbm.default-release/chrome/userChrome.css"
 
 [templates.quickshell]
 input_path = './templates/quickshell-colors.json'
