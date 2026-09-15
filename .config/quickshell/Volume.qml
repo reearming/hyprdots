@@ -12,6 +12,14 @@ Item {
     property bool muted: false
     property bool hovered: mouseArea.containsMouse
 
+    property var mirror: null
+
+    readonly property real displayVolume:
+        mirror ? mirror.volume : volume
+
+    readonly property bool displayMuted:
+        mirror ? mirror.muted : muted
+
     Process {
         id: getVolume
 
@@ -23,6 +31,9 @@ Item {
 
         stdout: StdioCollector {
             onStreamFinished: {
+                if (root.mirror)
+                    return
+
                 const match = text.match(/Volume:\s+([0-9.]+)/)
 
                 if (match) {
@@ -58,17 +69,18 @@ Item {
     }
 
     Component.onCompleted: {
-        getVolume.running = true
+        if (!root.mirror)
+            getVolume.running = true
     }
 
     Text {
         anchors.fill: parent
 
         text: {
-            if (root.muted || root.volume === 0)
+            if (root.displayMuted || root.displayVolume === 0)
                 return "󰖁"
 
-            if (root.volume < 50)
+            if (root.displayVolume < 50)
                 return "󰖀"
 
             return "󰕾"
@@ -93,14 +105,16 @@ Item {
         acceptedButtons: Qt.LeftButton
 
         onClicked: {
-            root.muted = !root.muted
-
-            setMute.running = false
-            setMute.running = true
+            root.toggleMuted()
         }
     }
 
     function setVolumeValue(value) {
+        if (root.mirror) {
+            root.mirror.setVolumeValue(value)
+            return
+        }
+
         root.volume = Math.round(
             Math.max(
                 0,
@@ -117,5 +131,21 @@ Item {
 
         setVolume.running = false
         setVolume.running = true
+    }
+
+    function applyMute() {
+        setMute.running = false
+        setMute.running = true
+    }
+
+    function toggleMuted() {
+        if (root.mirror) {
+            root.mirror.muted = !root.mirror.muted
+            root.mirror.applyMute()
+            return
+        }
+
+        root.muted = !root.muted
+        root.applyMute()
     }
 }

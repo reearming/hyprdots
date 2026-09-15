@@ -105,16 +105,17 @@ PanelWindow {
 
             spacing: 10
 
-            Text {
+Text {
                 width: 30
                 height: 30
 
-                text: ""
+                text: "󰣇"
 
                 color: Colors.md3.on_surface
+                font.family: "JetBrainsMonoNL Nerd Font"
+                font.pixelSize: 30
 
-                font.family: "JetBrainsMonoNL Nerd Font Mono"
-                font.pixelSize: 20
+                renderType: Text.NativeRendering
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -131,7 +132,6 @@ PanelWindow {
 
                         width: 30
                         height: 30
-
                         radius: 5
 
                         color: modelData.active
@@ -333,54 +333,71 @@ PanelWindow {
         anchor.window: bar
 
         anchor.rect.x: 8
-        anchor.rect.y: bar.screen.height / 4
+        anchor.rect.y:
+            bar.screen.height / 4
+            + 25
+            - (mediaContent.implicitHeight + 24) / 2
 
-        width: 360
-        height: 150
+        width: mediaContent.implicitWidth + 24
+        height: mediaContent.implicitHeight + 24
 
         visible: true
 
         color: "transparent"
 
-        Rectangle {
-            id: mediaPopupContent
-
-            width: parent.width
-            height: parent.height
-
-            x: bar.mediaPopupOpen && bar.mediaPlaying
-                ? 0
-                : -width
-
-            radius: 10
-            color: Colors.md3.surface
-
-            border.width: 2
-            border.color: Colors.md3.primary
-
-            clip: true
-
-            Behavior on x {
-                NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutCubic
-                }
+        mask: Region {
+            Region {
+                item: mediaPopupContent
             }
+        }
+
+        Item {
+            id: mediaPopupArea
+
+            anchors.fill: parent
 
             HoverHandler {
                 onHoveredChanged: {
-                    if (hovered && bar.mediaPlaying) {
+                    if (hovered)
                         mediaCloseTimer.stop()
-                        bar.mediaPopupOpen = true
-                    } else {
+                    else
                         mediaCloseTimer.restart()
-                    }
                 }
             }
 
-            Media {
-                anchors.fill: parent
-                anchors.margins: 12
+            Rectangle {
+                id: mediaPopupContent
+
+                width: parent.width
+                height: parent.height
+
+                x: bar.mediaPopupOpen && bar.mediaPlaying
+                    ? 0
+                    : -width
+
+                radius: 10
+
+                color: Colors.md3.surface
+
+                border.width: 2
+                border.color: Colors.md3.primary
+
+                clip: true
+
+                Behavior on x {
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+Media {
+                id: mediaContent
+
+                anchors.centerIn: parent
+
+                volumeMirror: volume
+            }
             }
         }
     }
@@ -392,7 +409,9 @@ PanelWindow {
 
         anchor.rect.x:
             rightBlock.x
-            - brightness.width / 2
+            + brightness.mapToItem(rightBlock, 0, 0).x
+            + brightness.width / 2
+            - 70
 
         anchor.rect.y:
             rightBlock.y + rightBlock.height
@@ -404,109 +423,134 @@ PanelWindow {
 
         color: "transparent"
 
-        Rectangle {
-            id: brightnessPopupContent
-
-            width: parent.width
-            height: parent.height
-
-            y: bar.brightnessPopupOpen ? 0 : -height
-
-            radius: 8
-            color: Colors.md3.surface
-
-            border.width: 2
-            border.color: Colors.md3.primary
-
-            Behavior on y {
-                NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutCubic
-                }
+        mask: Region {
+            Region {
+                item: brightnessPopupContent
             }
+        }
+
+        Item {
+            id: brightnessPopupArea
+
+            anchors.fill: parent
 
             HoverHandler {
                 onHoveredChanged: {
-                    if (hovered) {
+                    if (hovered)
                         brightnessCloseTimer.stop()
-                        bar.brightnessPopupOpen = true
-                    } else {
+                    else
                         brightnessCloseTimer.restart()
-                    }
                 }
             }
 
             Rectangle {
-                id: brightnessSlider
+                id: brightnessPopupContent
 
-                x: 12
-                y: 15
+                width: parent.width
+                height: parent.height
 
-                width: parent.width - 24
-                height: 8
+                y: bar.brightnessPopupOpen
+                    ? 0
+                    : -height
 
-                radius: 4
-                color: Colors.md3.surface_variant
+                radius: 8
 
-                Rectangle {
-                    width: parent.width * brightness.brightness / 100
-                    height: parent.height
+                color: Colors.md3.surface
 
-                    radius: 4
-                    color: Colors.md3.primary
+                border.width: 2
+                border.color: Colors.md3.primary
+
+                Behavior on y {
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
                 }
 
-                MouseArea {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
+                Rectangle {
+                    id: brightnessSlider
 
-                        topMargin: -12
-                        bottomMargin: -12
+                    x: 12
+                    y: 15
+
+                    width: parent.width - 24
+                    height: 8
+
+                    radius: 4
+
+                    color: Colors.md3.surface_variant
+
+                    Rectangle {
+                        width:
+                            parent.width
+                            * brightness.brightness
+                            / 100
+
+                        height: parent.height
+
+                        radius: 4
+
+                        color: Colors.md3.primary
                     }
 
-                    onClicked: {
-                        brightness.setBrightnessValue(
-                            Math.max(
-                                0,
-                                Math.min(
-                                    100,
-                                    mouseX / brightnessSlider.width * 100
-                                )
-                            )
-                        )
-                    }
+                    MouseArea {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: parent.top
+                            bottom: parent.bottom
 
-                    onPositionChanged: {
-                        if (pressed) {
+                            topMargin: -12
+                            bottomMargin: -12
+                        }
+
+                        onClicked: {
                             brightness.setBrightnessValue(
                                 Math.max(
                                     0,
                                     Math.min(
                                         100,
-                                        mouseX / brightnessSlider.width * 100
+                                        mouseX
+                                            / brightnessSlider.width
+                                            * 100
                                     )
                                 )
                             )
                         }
+
+                        onPositionChanged: {
+                            if (pressed) {
+                                brightness.setBrightnessValue(
+                                    Math.max(
+                                        0,
+                                        Math.min(
+                                            100,
+                                            mouseX
+                                                / brightnessSlider.width
+                                                * 100
+                                        )
+                                    )
+                                )
+                            }
+                        }
                     }
-                }
 
-                Rectangle {
-                    width: 16
-                    height: 16
+                    Rectangle {
+                        width: 16
+                        height: 16
 
-                    radius: 8
+                        radius: 8
 
-                    x: brightnessSlider.width
-                        * brightness.brightness / 100
-                        - width / 2
+                        x:
+                            brightnessSlider.width
+                            * brightness.brightness
+                            / 100
+                            - width / 2
 
-                    anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
-                    color: Colors.md3.primary
+                        color: Colors.md3.primary
+                    }
                 }
             }
         }
@@ -519,8 +563,9 @@ PanelWindow {
 
         anchor.rect.x:
             rightBlock.x
-            + volume.x
-            - volume.width / 2
+            + volume.mapToItem(rightBlock, 0, 0).x
+            + volume.width / 2
+            - 70
 
         anchor.rect.y:
             rightBlock.y + rightBlock.height
@@ -532,109 +577,134 @@ PanelWindow {
 
         color: "transparent"
 
-        Rectangle {
-            id: volumePopupContent
-
-            width: parent.width
-            height: parent.height
-
-            y: bar.volumePopupOpen ? 0 : -height
-
-            radius: 8
-            color: Colors.md3.surface
-
-            border.width: 2
-            border.color: Colors.md3.primary
-
-            Behavior on y {
-                NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutCubic
-                }
+        mask: Region {
+            Region {
+                item: volumePopupContent
             }
+        }
+
+        Item {
+            id: volumePopupArea
+
+            anchors.fill: parent
 
             HoverHandler {
                 onHoveredChanged: {
-                    if (hovered) {
+                    if (hovered)
                         volumeCloseTimer.stop()
-                        bar.volumePopupOpen = true
-                    } else {
+                    else
                         volumeCloseTimer.restart()
-                    }
                 }
             }
 
             Rectangle {
-                id: volumeSlider
+                id: volumePopupContent
 
-                x: 12
-                y: 15
+                width: parent.width
+                height: parent.height
 
-                width: parent.width - 24
-                height: 8
+                y: bar.volumePopupOpen
+                    ? 0
+                    : -height
 
-                radius: 4
-                color: Colors.md3.surface_variant
+                radius: 8
 
-                Rectangle {
-                    width: parent.width * volume.volume / 100
-                    height: parent.height
+                color: Colors.md3.surface
 
-                    radius: 4
-                    color: Colors.md3.primary
+                border.width: 2
+                border.color: Colors.md3.primary
+
+                Behavior on y {
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
                 }
 
-                MouseArea {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
+                Rectangle {
+                    id: volumeSlider
 
-                        topMargin: -12
-                        bottomMargin: -12
+                    x: 12
+                    y: 15
+
+                    width: parent.width - 24
+                    height: 8
+
+                    radius: 4
+
+                    color: Colors.md3.surface_variant
+
+                    Rectangle {
+                        width:
+                            parent.width
+                            * volume.volume
+                            / 100
+
+                        height: parent.height
+
+                        radius: 4
+
+                        color: Colors.md3.primary
                     }
 
-                    onClicked: {
-                        volume.setVolumeValue(
-                            Math.max(
-                                0,
-                                Math.min(
-                                    100,
-                                    mouseX / volumeSlider.width * 100
-                                )
-                            )
-                        )
-                    }
+                    MouseArea {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: parent.top
+                            bottom: parent.bottom
 
-                    onPositionChanged: {
-                        if (pressed) {
+                            topMargin: -12
+                            bottomMargin: -12
+                        }
+
+                        onClicked: {
                             volume.setVolumeValue(
                                 Math.max(
                                     0,
                                     Math.min(
                                         100,
-                                        mouseX / volumeSlider.width * 100
+                                        mouseX
+                                            / volumeSlider.width
+                                            * 100
                                     )
                                 )
                             )
                         }
+
+                        onPositionChanged: {
+                            if (pressed) {
+                                volume.setVolumeValue(
+                                    Math.max(
+                                        0,
+                                        Math.min(
+                                            100,
+                                            mouseX
+                                                / volumeSlider.width
+                                                * 100
+                                        )
+                                    )
+                                )
+                            }
+                        }
                     }
-                }
 
-                Rectangle {
-                    width: 16
-                    height: 16
+                    Rectangle {
+                        width: 16
+                        height: 16
 
-                    radius: 8
+                        radius: 8
 
-                    x: volumeSlider.width
-                        * volume.volume / 100
-                        - width / 2
+                        x:
+                            volumeSlider.width
+                            * volume.volume
+                            / 100
+                            - width / 2
 
-                    anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
-                    color: Colors.md3.primary
+                        color: Colors.md3.primary
+                    }
                 }
             }
         }
