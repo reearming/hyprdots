@@ -1,0 +1,9 @@
+.config/Happ.conf
+.config/qtProject.conf
+.config/pavuconrol.ini
+.config/Happ
+.config/dconf
+.config/systemd
+.config/pulse
+.config/mozilla/
+
