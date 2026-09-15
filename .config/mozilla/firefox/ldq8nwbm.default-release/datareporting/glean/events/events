@@ -4,3 +4,6 @@
 {"timestamp":1147546,"category":"pictureinpicture","name":"saw_toggle_toggle","extra":{"firstTime":"true","glean_timestamp":"1789476000758"}}
 {"timestamp":1149644,"category":"pictureinpicture","name":"saw_toggle_toggle","extra":{"glean_timestamp":"1789476000758","firstTime":"true"}}
 {"timestamp":1171522,"category":"tab","name":"interaction","extra":{"glean_timestamp":"1789476014445","action":"activate","tab_count":"1","layout":"horizontal","source":"tab_strip"}}
+{"timestamp":1270161,"category":"tab","name":"interaction","extra":{"layout":"horizontal","tab_count":"1","action":"activate","glean_timestamp":"1789476113083","source":"tab_strip"}}
+{"timestamp":1276556,"category":"tab","name":"interaction","extra":{"layout":"horizontal","tab_count":"1","glean_timestamp":"1789476119479","source":"tab_strip","action":"activate"}}
+{"timestamp":1275739,"category":"pictureinpicture","name":"saw_toggle_toggle","extra":{"firstTime":"true","glean_timestamp":"1789476124922"}}
