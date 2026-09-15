@@ -23,6 +23,10 @@ PanelWindow {
     property bool brightnessPopupOpen: false
     property bool volumePopupOpen: false
 
+    property bool mediaPopupVisible: false
+    property bool brightnessPopupVisible: false
+    property bool volumePopupVisible: false
+
     property bool mediaPlaying: {
         const players = Mpris.players.values
 
@@ -37,6 +41,33 @@ PanelWindow {
     onMediaPlayingChanged: {
         if (!mediaPlaying)
             mediaPopupOpen = false
+    }
+
+    onMediaPopupOpenChanged: {
+        if (mediaPopupOpen) {
+            mediaPopupVisible = true
+            mediaHideTimer.stop()
+        } else {
+            mediaHideTimer.restart()
+        }
+    }
+
+    onBrightnessPopupOpenChanged: {
+        if (brightnessPopupOpen) {
+            brightnessPopupVisible = true
+            brightnessHideTimer.stop()
+        } else {
+            brightnessHideTimer.restart()
+        }
+    }
+
+    onVolumePopupOpenChanged: {
+        if (volumePopupOpen) {
+            volumePopupVisible = true
+            volumeHideTimer.stop()
+        } else {
+            volumeHideTimer.restart()
+        }
     }
 
     Timer {
@@ -66,6 +97,36 @@ PanelWindow {
 
         onTriggered: {
             bar.volumePopupOpen = false
+        }
+    }
+
+    Timer {
+        id: mediaHideTimer
+
+        interval: 250
+
+        onTriggered: {
+            bar.mediaPopupVisible = false
+        }
+    }
+
+    Timer {
+        id: brightnessHideTimer
+
+        interval: 250
+
+        onTriggered: {
+            bar.brightnessPopupVisible = false
+        }
+    }
+
+    Timer {
+        id: volumeHideTimer
+
+        interval: 250
+
+        onTriggered: {
+            bar.volumePopupVisible = false
         }
     }
 
@@ -338,7 +399,7 @@ PanelWindow {
         width: 360
         height: 150
 
-        visible: true
+        visible: bar.mediaPopupVisible
 
         color: "transparent"
 
@@ -367,6 +428,15 @@ PanelWindow {
                 }
             }
 
+            Media {
+                anchors.fill: parent
+                anchors.margins: 12
+            }
+        }
+
+        Item {
+            anchors.fill: parent
+
             HoverHandler {
                 onHoveredChanged: {
                     if (hovered && bar.mediaPlaying) {
@@ -376,11 +446,6 @@ PanelWindow {
                         mediaCloseTimer.restart()
                     }
                 }
-            }
-
-            Media {
-                anchors.fill: parent
-                anchors.margins: 12
             }
         }
     }
@@ -402,7 +467,7 @@ PanelWindow {
         width: 140
         height: 38
 
-        visible: true
+        visible: bar.brightnessPopupVisible
 
         color: "transparent"
 
@@ -424,17 +489,6 @@ PanelWindow {
                 NumberAnimation {
                     duration: 200
                     easing.type: Easing.OutCubic
-                }
-            }
-
-            HoverHandler {
-                onHoveredChanged: {
-                    if (hovered) {
-                        brightnessCloseTimer.stop()
-                        bar.brightnessPopupOpen = true
-                    } else {
-                        brightnessCloseTimer.restart()
-                    }
                 }
             }
 
@@ -512,6 +566,22 @@ PanelWindow {
                 }
             }
         }
+
+        Item {
+            anchors.fill: parent
+            z: 100
+
+            HoverHandler {
+                onHoveredChanged: {
+                    if (hovered) {
+                        brightnessCloseTimer.stop()
+                        bar.brightnessPopupOpen = true
+                    } else {
+                        brightnessCloseTimer.restart()
+                    }
+                }
+            }
+        }
     }
 
     PopupWindow {
@@ -531,7 +601,7 @@ PanelWindow {
         width: 140
         height: 38
 
-        visible: true
+        visible: bar.volumePopupVisible
 
         color: "transparent"
 
@@ -553,17 +623,6 @@ PanelWindow {
                 NumberAnimation {
                     duration: 200
                     easing.type: Easing.OutCubic
-                }
-            }
-
-            HoverHandler {
-                onHoveredChanged: {
-                    if (hovered) {
-                        volumeCloseTimer.stop()
-                        bar.volumePopupOpen = true
-                    } else {
-                        volumeCloseTimer.restart()
-                    }
                 }
             }
 
@@ -638,6 +697,22 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: Colors.md3.primary
+                }
+            }
+        }
+
+        Item {
+            anchors.fill: parent
+            z: 100
+
+            HoverHandler {
+                onHoveredChanged: {
+                    if (hovered) {
+                        volumeCloseTimer.stop()
+                        bar.volumePopupOpen = true
+                    } else {
+                        volumeCloseTimer.restart()
+                    }
                 }
             }
         }
