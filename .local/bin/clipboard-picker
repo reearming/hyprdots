@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rofi \
+    -modi "clipboard:$HOME/.local/bin/cliphist-rofi-img" \
+    -show clipboard \
+    -show-icons \
+    -theme "$HOME/.config/rofi/clipboard.rasi"
